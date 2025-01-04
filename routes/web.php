@@ -22,8 +22,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('/categories', CategoryController::class);
 
     // Products
-    Route::resource('/products', ProductController::class);
     Route::get('/products/export-csv', [ProductController::class, 'exportCsv'])->name('products.export-csv');
+    Route::resource('/products', ProductController::class);
 
 
 

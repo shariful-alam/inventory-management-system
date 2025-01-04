@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ExportProductsToCsv;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\Factory;
@@ -9,6 +10,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
@@ -19,7 +21,7 @@ class ProductController extends Controller
     {
         $query = Product::query()->with('category');
 
-        if ($request->has('search')) {
+        if ($request->search !== null) {
             $search = $request->get('search');
             $query->where('name', 'like', "%$search%")
                 ->orWhere('description', 'like', "%$search%")
@@ -28,7 +30,7 @@ class ProductController extends Controller
                 });
         }
 
-        if ($request->has('price_min') && $request->has('price_max')) {
+        if ($request->price_min !== null && $request->price_max !== null) {
             $query->whereBetween('price', [$request->price_min, $request->price_max]);
         }
 
@@ -106,8 +108,13 @@ class ProductController extends Controller
     /**
      * Export to CSV
      */
-    public function exportCsv(Request $request)
+    public function exportCsv(): RedirectResponse
     {
+        $user = Auth::user(); // Get the authenticated user
 
+        // Dispatch the export job
+        ExportProductsToCsv::dispatch($user);
+
+        return redirect()->route('products.index')->with('success', 'Export job has been dispatched. You will receive the CSV file in your email.');
     }
 }

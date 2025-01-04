@@ -9,15 +9,50 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
-                    <div class="flex justify-between mb-4">
-                        <a href="{{ route('products.create') }}" class="btn btn-primary bg-blue-500 text-white px-4 py-2 rounded">
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between mb-6">
+                        <a href="{{ route('products.create') }}" class="btn btn-primary bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
                             Add Product
                         </a>
-                        <a href="{{ route('products.export-csv') }}" class="btn btn-secondary bg-green-500 text-white px-4 py-2 rounded">
+                        <a href="{{ route('products.export-csv') }}" class="btn btn-secondary bg-green-500 text-white px-4 py-2 rounded shadow hover:bg-green-600">
                             Download CSV
                         </a>
                     </div>
 
+                    <!-- Search and Filters -->
+                    <form method="GET" action="{{ route('products.index') }}" class="mb-6 space-y-4 md:space-y-0 md:flex md:space-x-4">
+                        <!-- Search -->
+                        <div>
+                            <label for="search" class="block text-sm font-medium text-gray-700">Search</label>
+                            <input type="text" name="search" id="search" value="{{ request('search') }}" placeholder="Search products..." class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+
+                        <!-- Price Range -->
+                        <div>
+                            <label for="price_min" class="block text-sm font-medium text-gray-700">Min Price</label>
+                            <input type="number" name="price_min" id="price_min" value="{{ request('price_min') }}" placeholder="Min Price" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="price_max" class="block text-sm font-medium text-gray-700">Max Price</label>
+                            <input type="number" name="price_max" id="price_max" value="{{ request('price_max') }}" placeholder="Max Price" class="block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+
+                        <!-- Availability -->
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" name="availability" id="availability" value="1" {{ request('availability') ? 'checked' : '' }} class="rounded border-gray-300 text-blue-600 shadow-sm focus:ring-blue-500">
+                            <label for="availability" class="text-sm font-medium text-gray-700">In Stock</label>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="flex items-center">
+                            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600 focus:outline-none">
+                                Search
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Products Table -->
                     <div class="overflow-x-auto">
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
@@ -31,7 +66,7 @@
                             </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
-                            @foreach ($products as $product)
+                            @forelse ($products as $product)
                                 <tr>
                                     <td class="px-6 py-4 text-sm text-gray-500">{{ $product->id }}</td>
                                     <td class="px-6 py-4 text-sm text-gray-900">{{ $product->name }}</td>
@@ -47,9 +82,18 @@
                                         </form>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="px-6 py-4 text-sm text-gray-500 text-center">No products found.</td>
+                                </tr>
+                            @endforelse
                             </tbody>
                         </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="mt-4">
+                        {{ $products->links() }}
                     </div>
                 </div>
             </div>
