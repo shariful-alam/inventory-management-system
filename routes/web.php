@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -8,9 +10,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'dashboard'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     // Profile
@@ -20,6 +20,12 @@ Route::middleware('auth')->group(function () {
 
     // Categories
     Route::resource('/categories', CategoryController::class);
+
+    // Products
+    Route::resource('/products', ProductController::class);
+    Route::get('/products/export-csv', [ProductController::class, 'exportCsv'])->name('products.export-csv');
+
+
 
 });
 
